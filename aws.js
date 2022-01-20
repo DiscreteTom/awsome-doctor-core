@@ -7,13 +7,15 @@ let aws = { EC2, RDS, ElasticLoadBalancingV2 };
 
 function configure({ accessKeyId, secretAccessKey, region }) {
   let config = {
-    credentials: {
-      accessKeyId,
-      secretAccessKey,
-    },
-    region,
+    region: region || "us-east-1",
   };
 
+  if (accessKeyId && secretAccessKey) {
+    config.credentials = {
+      accessKeyId,
+      secretAccessKey,
+    };
+  }
   // init all clients
   aws["ec2"] = new EC2(config);
   aws["rds"] = new RDS(config);
