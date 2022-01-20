@@ -1,6 +1,6 @@
 {
   "name": "awsome-doctor-core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,6 +16,7 @@
   "bugs": {
     "url": "https://github.com/DiscreteTom/awsome-doctor-core/issues"
   },
+  "type": "module",
   "homepage": "https://github.com/DiscreteTom/awsome-doctor-core#readme",
   "dependencies": {
     "@aws-sdk/client-ec2": "^3.47.0",

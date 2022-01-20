@@ -1,6 +1,6 @@
-import context from "./context";
-import { execute } from "./executor";
-import { aws } from "./aws";
+import context from "./context.js";
+import { execute } from "./executor.js";
+import { aws } from "./aws.js";
 
 export default {
   async run(js, data) {

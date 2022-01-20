@@ -1,5 +1,5 @@
-import vpc from "./vpc";
-import securityGroup from "./securityGroup";
+import vpc from "./vpc.js";
+import securityGroup from "./securityGroup.js";
 
 export default {
   vpc,

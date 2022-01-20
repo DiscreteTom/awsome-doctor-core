@@ -1,7 +1,7 @@
-import { aws } from "./aws";
+import { aws } from "./aws.js";
 import jp from "jsonpath";
 import * as yaml from "js-yaml";
-import workflowUtils from "./utils";
+import workflowUtils from "./utils/index.js";
 import axios from "axios";
 
 export default {
