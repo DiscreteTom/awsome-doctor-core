@@ -19,13 +19,23 @@
  *   res, // the response of `describeSecurityGroups`, see https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-ec2/interfaces/describesecuritygroupscommandoutput.html
  *   securityGroupIds: [],
  *   anyTrafficPeer: {
- *     type: 'any|cidr|no',
- *     cidr: [], // if type == 'cidr'
+ *     any: true,
+ *     cidr: [],
+ *     prefix: [],
+ *     sg: [{
+ *       UserId: '', // aws account id
+ *       GroupId: '', // sg id
+ *     }],
  *   },
- *   portPeer: {
- *     type: 'any|cidr|no',
- *     cidr: [], // if type == 'cidr'
- *   }
+ *   peer: {
+ *     any: true,
+ *     cidr: [],
+ *     prefix: [],
+ *     sg: [{
+ *       UserId: '', // aws account id
+ *       GroupId: '', // sg id
+ *     }],
+ *   },
  * }
  * ```
  */
@@ -46,7 +56,13 @@ async function checkEC2Instances({
 
   return {
     securityGroupIds,
-    ...(await checkPort({ $, direction, securityGroupIds, protocol, port })),
+    ...(await checkPort({
+      $,
+      direction,
+      securityGroupIds,
+      protocol,
+      port,
+    })),
   };
 }
 
@@ -66,19 +82,28 @@ async function checkEC2Instances({
  *   err,
  *   res, // the response of `describeSecurityGroups`, see https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-ec2/interfaces/describesecuritygroupscommandoutput.html
  *   anyTrafficPeer: {
- *     type: 'any|cidr|no',
- *     cidr: [], // if type == 'cidr'
+ *     any: true,
+ *     cidr: [],
+ *     prefix: [],
+ *     sg: [{
+ *       UserId: '', // aws account id
+ *       GroupId: '', // sg id
+ *     }],
  *   },
- *   portPeer: {
- *     type: 'any|cidr|no',
- *     cidr: [], // if type == 'cidr'
- *   }
+ *   peer: {
+ *     any: true,
+ *     cidr: [],
+ *     prefix: [],
+ *     sg: [{
+ *       UserId: '', // aws account id
+ *       GroupId: '', // sg id
+ *     }],
+ *   },
  * }
  * ```
  */
 async function checkPort({ $, direction, securityGroupIds, protocol, port }) {
   let res;
-  let result = {};
   try {
     res = await $.aws.ec2.describeSecurityGroups({
       GroupIds: securityGroupIds,
@@ -87,21 +112,11 @@ async function checkPort({ $, direction, securityGroupIds, protocol, port }) {
     return { err };
   }
 
-  let anyTrafficPeer = allowAnyPeer({
-    cidr: getAnyTrafficCidr({ $, res, direction }),
-  });
-
-  if (anyTrafficPeer.type == "any") {
-    return { anyTrafficPeer, res };
-  } else {
-    result.anyTrafficPeer = anyTrafficPeer;
-  }
-
-  result.portPeer = allowAnyPeer({
-    cidr: getPortCidr({ $, res, direction, protocol, port }),
-  });
-  result.res = res;
-  return result;
+  return {
+    anyTrafficPeer: getPeer({ $, res, direction, protocol: "-1" }),
+    peer: getPeer({ $, res, direction, protocol, port }),
+    res,
+  };
 }
 
 /**
@@ -110,95 +125,73 @@ async function checkPort({ $, direction, securityGroupIds, protocol, port }) {
  * - `$`: context
  * - `res`: the response of `describeSecurityGroups`, see https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-ec2/interfaces/describesecuritygroupscommandoutput.html
  * - `direction`: `'in'`/`'out'`
- *
- * ## Return
- *
- * A list of CIDR. E.g.: `['0.0.0.0/0', '192.168.0.0/16']`.
- */
-function getAnyTrafficCidr({ $, res, direction }) {
-  return $.jp.query(
-    res,
-    `$..${
-      direction == "in" ? "IpPermissions" : "IpPermissionsEgress"
-    }[?(@.IpProtocol=='-1')]..CidrIp`
-  );
-}
-
-/**
- * ## Params
- *
- * - `cidr`: A list of CIDR, e.g. `['0.0.0.0/0', '192.168.0.0'16']`.
+ * - `protocol`: `'tcp'`/`'ucp'`/`'icmp'`/`'-1'`(all)
+ * - `port`
  *
  * ## Return
  *
  * ```
  * {
- *   type: 'any|cidr|no',
- *   cidr: ['192.168.0.0/16'], // if type == 'cidr'
+ *   any: true,
+ *   cidr: [],
+ *   prefix: [],
+ *   sg: [{
+ *     UserId: '', // aws account id
+ *     GroupId: '', // sg id
+ *   }],
  * }
  * ```
  */
-function allowAnyPeer({ cidr }) {
-  if (cidr.length === 0) {
-    return { type: "no" };
-  } else {
-    if (cidr.indexOf("0.0.0.0/0" != -1)) {
-      return { type: "any" };
+function getPeer({ $, res, direction, protocol, port }) {
+  let result = {
+    any: false,
+    cidr: [],
+    prefix: [],
+    sg: [],
+  };
+
+  let portCondition =
+    protocol == "-1"
+      ? "true"
+      : `(@.FromPort == -1 || (@.FromPort <= ${port} && @.ToPort >= ${port}))`;
+
+  // get sg rules
+  let ipPermissions = $.jp.query(
+    res,
+    `$..${
+      direction == "in" ? "IpPermissions" : "IpPermissionsEgress"
+    }[?(@.IpProtocol == '${protocol}' && ${portCondition})]`
+  );
+
+  if (ipPermissions.length == 0) return result;
+
+  // get cidrs
+  $.jp.query(ipPermissions, `$..CidrIp`).map((cidr) => {
+    if (cidr == "0.0.0.0/0") {
+      result.any = true;
     } else {
-      return { type: "cidr", cidr };
+      result.cidr.push(cidr);
     }
-  }
-}
+  });
 
-/**
- * ## Params
- *
- * - `$`: context
- * - `res`: the response of `describeSecurityGroups`, see https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-ec2/interfaces/describesecuritygroupscommandoutput.html
- * - `direction`: `'in'`/`'out'`
- * - `protocol`: `'tcp'`/`'ucp'`/`'icmp'`
- * - `port`
- *
- * ## Return
- *
- * A list of CIDR. E.g.: `['0.0.0.0/0', '192.168.0.0/16']`.
- */
-function getPortCidr({ $, res, direction, protocol, port }) {
-  return $.jp.query(
-    res,
-    `$..${
-      direction == "in" ? "IpPermissions" : "IpPermissionsEgress"
-    }[?(@.IpProtocol=='${protocol}' && (@.FromPort==${port} || @.FromPort==-1))]..CidrIp`
-  );
-}
+  // get prefix ids
+  $.jp.query(ipPermissions, `$..PrefixListId`).map((prefix) => {
+    result.prefix.push(prefix);
+  });
 
-/**
- * ## Params
- *
- * - `$`: context
- * - `res`: the response of `describeSecurityGroups`, see https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-ec2/interfaces/describesecuritygroupscommandoutput.html
- * - `direction`: `'in'`/`'out'`
- * - `protocol`: `'tcp'`/`'ucp'`/`'icmp'`
- * - `port`
- *
- * ## Return
- *
- * A list of security group ids.
- */
-function getPortPeerSecurityGroup({ $, res, direction, protocol, port }) {
-  return $.jp.query(
-    res,
-    `$..${
-      direction == "in" ? "IpPermissions" : "IpPermissionsEgress"
-    }[?(@.IpProtocol=='${protocol}' && (@.FromPort==${port} || @.FromPort==-1))]..GroupId`
-  );
+  // get peer sgs
+  $.jp
+    .query(ipPermissions, `$..UserIdGroupPairs`)
+    .flat()
+    .map((userSgPair) => {
+      result.sg.push(userSgPair);
+    });
+
+  return result;
 }
 
 export default {
   checkPort,
-  getAnyTrafficCidr,
-  allowAnyPeer,
-  getPortCidr,
+  getPeer,
   checkEC2Instances,
-  getPortPeerSecurityGroup,
 };
