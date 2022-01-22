@@ -26,6 +26,7 @@
  *       UserId: '', // aws account id
  *       GroupId: '', // sg id
  *     }],
+ *     no: false,
  *   },
  *   peer: {
  *     any: true,
@@ -35,6 +36,7 @@
  *       UserId: '', // aws account id
  *       GroupId: '', // sg id
  *     }],
+ *     no: false,
  *   },
  * }
  * ```
@@ -89,6 +91,7 @@ async function checkEC2Instances({
  *       UserId: '', // aws account id
  *       GroupId: '', // sg id
  *     }],
+ *     no: false,
  *   },
  *   peer: {
  *     any: true,
@@ -98,6 +101,7 @@ async function checkEC2Instances({
  *       UserId: '', // aws account id
  *       GroupId: '', // sg id
  *     }],
+ *     no: false,
  *   },
  * }
  * ```
@@ -139,6 +143,7 @@ async function checkPort({ $, direction, securityGroupIds, protocol, port }) {
  *     UserId: '', // aws account id
  *     GroupId: '', // sg id
  *   }],
+ *   no: false,
  * }
  * ```
  */
@@ -148,6 +153,7 @@ function getPeer({ $, res, direction, protocol, port }) {
     cidr: [],
     prefix: [],
     sg: [],
+    no: true,
   };
 
   let portCondition =
@@ -172,11 +178,13 @@ function getPeer({ $, res, direction, protocol, port }) {
     } else {
       result.cidr.push(cidr);
     }
+    result.no = false;
   });
 
   // get prefix ids
   $.jp.query(ipPermissions, `$..PrefixListId`).map((prefix) => {
     result.prefix.push(prefix);
+    result.no = false;
   });
 
   // get peer sgs
@@ -185,6 +193,7 @@ function getPeer({ $, res, direction, protocol, port }) {
     .flat()
     .map((userSgPair) => {
       result.sg.push(userSgPair);
+      result.no = false;
     });
 
   return result;
