@@ -1,8 +1,14 @@
 /**
- * This file contains the util functions in `$.utils.securityGroup`
+ * This file contains the util functions in `$.utils.vpc`
  */
 
 /**
+ * ## Params
+ *
+ * - `$`: context
+ * - `subnetId`
+ * - `vpcId`: optional VPC Id
+ *
  * ## Return
  *
  * ```
@@ -17,7 +23,7 @@ async function checkSubnetIgw({ $, subnetId, vpcId }) {
   let res = await getSubnetRouteTable({ $, subnetId, vpcId });
 
   if (res.err) {
-    return { err: res.err };
+    return res;
   }
 
   let igwCidr = $.jp.query(
@@ -26,7 +32,7 @@ async function checkSubnetIgw({ $, subnetId, vpcId }) {
   );
 
   if (igwCidr.length !== 0) {
-    if (igwCidr.indexOf("0.0.0.0/0") != -1) {
+    if (igwCidr.includes("0.0.0.0/0")) {
       return { type: "any" };
     } else {
       return { type: "cidr", cidr: igwCidr };
@@ -37,6 +43,12 @@ async function checkSubnetIgw({ $, subnetId, vpcId }) {
 }
 
 /**
+ * ## Params
+ *
+ * - `$`: context
+ * - `subnetId`
+ * - `vpcId`: optional VPC Id
+ *
  * ## Return
  *
  * ```
@@ -46,7 +58,7 @@ async function checkSubnetIgw({ $, subnetId, vpcId }) {
  * }
  * ```
  */
-async function getSubnetRouteTable({ $, vpcId, subnetId }) {
+async function getSubnetRouteTable({ $, subnetId, vpcId }) {
   try {
     let res;
     // find route table by subnet id
@@ -55,10 +67,17 @@ async function getSubnetRouteTable({ $, vpcId, subnetId }) {
     });
 
     if (res.RouteTables.length !== 0) {
-      // which means explicitly associated a route table
+      // route table explicitly associated with the subnet
       return { rt: res.RouteTables[0] };
     } else {
       // use VPC main route table
+      if (!vpcId) {
+        res = await $.aws.ec2.describeSubnets({
+          Filters: [{ Name: "subnet-id", Values: [subnetId] }],
+        });
+        vpcId = $.jp.query(res, `$..VpcId`)[0];
+      }
+
       res = await $.aws.ec2.describeRouteTables({
         Filters: [{ Name: "vpc-id", Values: [vpcId] }],
       });
