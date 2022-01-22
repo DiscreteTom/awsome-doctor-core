@@ -159,7 +159,7 @@ function getPeer({ $, res, direction, protocol, port }) {
   let portCondition =
     protocol == "-1"
       ? "true"
-      : `(@.FromPort == -1 || (@.FromPort <= ${port} && @.ToPort >= ${port}))`;
+      : `(@.FromPort == -1 || (@.FromPort <= ${port} && (@.ToPort >= ${port} || @.ToPort == -1)))`;
 
   // get sg rules
   let ipPermissions = $.jp.query(
