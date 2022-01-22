@@ -1,5 +1,5 @@
 /**
- * This file contains the util functions in `$.utils.securityGroup`
+ * This file contains the util functions in `$.utils.sg`
  */
 
 /**
