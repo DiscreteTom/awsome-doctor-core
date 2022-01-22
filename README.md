@@ -2,6 +2,26 @@
 
 Workflow executor, plugins & util functions of [Awsome Doctor](https://discretetom.github.io/awsome-doctor/).
 
+## Installation
+
+```bash
+npm install awsome-doctor-core
+```
+
+## Usage
+
+```js
+import executor from "awsome-doctor-core";
+
+// using default credential provider
+executor.configure({ region: "us-east-1" });
+// or using custom ak/sk
+executor.configure({ accessKeyId, secretAccessKey, region });
+
+// run workflow step
+executor.run(step.js, workflowData);
+```
+
 ## Related Projects
 
 - [awsome-doctor](https://github.com/DiscreteTom/awsome-doctor): A browser based AWS troubleshooting tool.
