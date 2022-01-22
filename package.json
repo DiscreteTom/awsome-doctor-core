@@ -1,7 +1,7 @@
 {
   "name": "awsome-doctor-core",
   "version": "0.1.1",
-  "description": "",
+  "description": "Workflow executor, plugins and util functions of Awsome Doctor.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -11,7 +11,7 @@
     "url": "git+https://github.com/DiscreteTom/awsome-doctor-core.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "DiscreteTom <discrete_tom@outlook.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/DiscreteTom/awsome-doctor-core/issues"
