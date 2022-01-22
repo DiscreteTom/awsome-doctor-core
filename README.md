@@ -13,14 +13,18 @@ npm install awsome-doctor-core
 ```js
 import executor from "awsome-doctor-core";
 
-// using default credential provider
+// use default credential provider & region
+executor.configure({});
+// or specify a region
 executor.configure({ region: "us-east-1" });
-// or using custom ak/sk
+// or use custom ak/sk
 executor.configure({ accessKeyId, secretAccessKey, region });
 
 // run workflow step
 executor.run(step.js, workflowData);
 ```
+
+## [CHANGELOG](https://github.com/DiscreteTom/awsome-doctor-core/blob/main/CHANGELOG.md)
 
 ## Related Projects
 
