@@ -1,7 +1,7 @@
 import vpc from "./vpc.js";
-import securityGroup from "./securityGroup.js";
+import sg from "./sg.js";
 
 export default {
   vpc,
-  securityGroup,
+  sg,
 };
