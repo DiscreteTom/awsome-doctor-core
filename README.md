@@ -1,5 +1,7 @@
 # awsome-doctor-core
 
+[![npm](https://img.shields.io/npm/v/awsome-doctor-core)](https://www.npmjs.com/package/awsome-doctor-core)
+
 Workflow executor, plugins & util functions of [Awsome Doctor](https://discretetom.github.io/awsome-doctor/).
 
 ## Installation
