@@ -1,6 +1,6 @@
 {
   "name": "awsome-doctor-core",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Workflow executor, plugins and util functions of Awsome Doctor.",
   "main": "index.js",
   "scripts": {
