@@ -15,7 +15,6 @@
  *
  * ```
  * {
- *   err,
  *   res, // the response of `describeSecurityGroups`, see https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-ec2/interfaces/describesecuritygroupscommandoutput.html
  *   securityGroupIds: [],
  *   anyTrafficPeer: {
@@ -49,12 +48,8 @@ async function checkEC2Instances({
   port,
 }) {
   let securityGroupIds;
-  try {
-    let res = await $.aws.ec2.describeInstances({ InstanceIds: instanceIds });
-    securityGroupIds = $.jp.query(res, "$..SecurityGroups[*].GroupId");
-  } catch (err) {
-    return { err };
-  }
+  let res = await $.aws.ec2.describeInstances({ InstanceIds: instanceIds });
+  securityGroupIds = $.jp.query(res, "$..SecurityGroups[*].GroupId");
 
   return {
     securityGroupIds,
@@ -81,7 +76,6 @@ async function checkEC2Instances({
  *
  * ```
  * {
- *   err,
  *   res, // the response of `describeSecurityGroups`, see https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-ec2/interfaces/describesecuritygroupscommandoutput.html
  *   anyTrafficPeer: {
  *     any: true,
@@ -107,14 +101,9 @@ async function checkEC2Instances({
  * ```
  */
 async function checkPort({ $, direction, securityGroupIds, protocol, port }) {
-  let res;
-  try {
-    res = await $.aws.ec2.describeSecurityGroups({
-      GroupIds: securityGroupIds,
-    });
-  } catch (err) {
-    return { err };
-  }
+  let res = await $.aws.ec2.describeSecurityGroups({
+    GroupIds: securityGroupIds,
+  });
 
   return {
     anyTrafficPeer: getPeer({ $, res, direction, protocol: "-1" }),
