@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.3.1
+
+- Support `$.panic`/`$.done`.
+
 ## v0.3.0
 
 - Util functions will throw exceptions instead of return error.
