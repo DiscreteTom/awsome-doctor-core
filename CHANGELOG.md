@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.3.3
+
+- More AWS SDK.
+
 ## v0.3.2
 
 - Add `$.utils.vpc.checkNacl`.
