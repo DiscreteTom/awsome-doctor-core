@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.3.2
+
+- Add `$.utils.vpc.checkNacl`.
+- Add `$.utils.vpc.checkSubnetNacl`.
+
 ## v0.3.1
 
 - Support `$.panic`/`$.done`.
