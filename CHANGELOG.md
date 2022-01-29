@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.3.4
+
+- Fix `$.stop`.
+
 ## v0.3.3
 
 - More AWS SDK.
