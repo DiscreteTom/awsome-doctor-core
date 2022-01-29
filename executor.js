@@ -5,7 +5,7 @@ export async function execute($, js) {
     await eval(`(async ()=>{${js}})()`);
   } catch (e) {
     if (e instanceof StepStopper) {
-      if (e.type == "ok") return { ok: e.msg };
+      if (e.type == "ok") return { ok: e.msg, stop: e.$.stop };
       else if (e.type == "err") {
         console.log(e);
         return { err: e.msg };
@@ -20,5 +20,6 @@ export async function execute($, js) {
     ok: $.ok,
     info: $.info,
     err: $.err,
+    stop: $.stop,
   };
 }

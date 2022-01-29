@@ -19,10 +19,10 @@ export default {
       utils: workflowUtils,
       stop: false,
       panic(msg) {
-        throw new StepStopper("err", msg);
+        throw new StepStopper("err", msg, this);
       },
       done(msg) {
-        throw new StepStopper("ok", msg);
+        throw new StepStopper("ok", msg, this);
       },
     };
   },
