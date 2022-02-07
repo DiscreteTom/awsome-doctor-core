@@ -22,6 +22,10 @@ export default {
       done(msg) {
         throw new StepStopper("ok", msg, this);
       },
+      async import(url) {
+        let res = await axios.get(url);
+        return eval(res.data);
+      },
     };
   },
 };
