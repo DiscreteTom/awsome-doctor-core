@@ -8,8 +8,10 @@ export default {
     return await execute($, js);
   },
   configure({ accessKeyId, secretAccessKey, region }) {
-    AWS.config.region = region;
-    AWS.config.credentials.accessKeyId = accessKeyId;
-    AWS.config.credentials.secretAccessKey = secretAccessKey;
+    if (region) AWS.config.region = region;
+    if (accessKeyId && secretAccessKey) {
+      AWS.config.credentials.accessKeyId = accessKeyId;
+      AWS.config.credentials.secretAccessKey = secretAccessKey;
+    }
   },
 };
