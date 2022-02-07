@@ -10,8 +10,10 @@ export default {
   configure({ accessKeyId, secretAccessKey, region }) {
     if (region) AWS.config.region = region;
     if (accessKeyId && secretAccessKey) {
-      AWS.config.credentials.accessKeyId = accessKeyId;
-      AWS.config.credentials.secretAccessKey = secretAccessKey;
+      AWS.config.credentials = new AWS.Credentials({
+        accessKeyId,
+        secretAccessKey,
+      });
     }
   },
 };

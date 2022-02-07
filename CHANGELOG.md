@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.1
+
+- Fix `configure` in browser.
+
 ## v0.4.0
 
 - Use AWS sdk v2 instead of v3.
