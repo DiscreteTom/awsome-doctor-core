@@ -1,4 +1,4 @@
-import { aws } from "./aws.js";
+import AWS from "aws-sdk";
 import jp from "jsonpath";
 import * as yaml from "js-yaml";
 import workflowUtils from "./utils/index.js";
@@ -8,7 +8,7 @@ import StepStopper from "./model.js";
 export default {
   build(data) {
     return {
-      aws,
+      AWS,
       data,
       axios,
       jp,
