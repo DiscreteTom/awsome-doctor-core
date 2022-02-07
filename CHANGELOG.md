@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.4.0
+
+- Use AWS sdk v2 instead of v3.
+- Remove utils to [awsome-doctor-utils](https://github.com/DiscreteTom/awsome-doctor-utils).
+- Add `$.import` helper function.
+
 ## v0.3.4
 
 - Fix `$.stop`.
