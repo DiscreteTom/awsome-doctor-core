@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.4.2
+
+- Add `$.aws` as the AWS helper.
+- Modify `$.import`, which will simulate & return a window object.
+
 ## v0.4.1
 
 - Fix `configure` in browser.
