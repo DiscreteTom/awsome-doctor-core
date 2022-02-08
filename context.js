@@ -3,11 +3,13 @@ import jp from "jsonpath";
 import * as yaml from "js-yaml";
 import axios from "axios";
 import StepStopper from "./model.js";
+import { aws } from "./aws-helper.js";
 
 export default {
   build(data) {
     return {
       AWS,
+      aws,
       data,
       axios,
       jp,
