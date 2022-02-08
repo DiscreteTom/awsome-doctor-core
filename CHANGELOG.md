@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.4.3
+
+- Add `$.aws.wrap` to wrap existing AWS client.
+
 ## v0.4.2
 
 - Add `$.aws` as the AWS helper.
