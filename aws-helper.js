@@ -303,18 +303,26 @@ let serviceNameMapping = {
   xray: "XRay",
 };
 
+let handler = {
+  get(target, name) {
+    return async (param) => {
+      return await target[name](param).promise();
+    };
+  },
+};
+
 export let aws = new Proxy(
   {},
   {
     get: function (_, name) {
+      if (name == "wrap") {
+        return (client) => {
+          return new Proxy(client, handler);
+        };
+      }
+
       let client = new AWS[serviceNameMapping[name]]();
-      return new Proxy(client, {
-        get(target, name) {
-          return async (param) => {
-            return await target[name](param).promise();
-          };
-        },
-      });
+      return new Proxy(client, handler);
     },
   }
 );
